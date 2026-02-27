@@ -2,7 +2,12 @@
   "name": "terminal-error-sound",
   "displayName": "terminal_error_sound",
   "description": "Plays sound when terminal command fails",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sanjeevnode/terminal_error_sound"
+  },
   "version": "0.0.1",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.109.0"
   },
