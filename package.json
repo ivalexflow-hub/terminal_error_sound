@@ -1,6 +1,6 @@
 {
-  "name": "terminal-error-sound",
-  "displayName": "terminal_error_sound",
+  "name": "sanjeevnode-terminal-error-sound",
+  "displayName": "Funny Terminal Error Sound",
   "description": "Plays sound when terminal command fails",
   "publisher": "sanjeevnode",
   "repository": {
