@@ -1,53 +1,57 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import * as soundPlay from 'sound-play';
+import { execFile } from 'child_process';
+
+let wavPath = '';
+
+function playSound() {
+	console.log(`terminal-error-sound: playing ${wavPath}`);
+	execFile('powershell.exe', [
+		'-NoProfile', '-NonInteractive', '-Command',
+		`(New-Object System.Media.SoundPlayer '${wavPath}').PlaySync()`
+	], (err, stdout, stderr) => {
+		if (err) {
+			console.error('terminal-error-sound: playback error –', err.message);
+		}
+		if (stderr) {
+			console.error('terminal-error-sound: PS stderr –', stderr.trim());
+		}
+		if (stdout) {
+			console.log('terminal-error-sound: PS stdout –', stdout.trim());
+		}
+	});
+}
 
 export function activate(context: vscode.ExtensionContext) {
-
 	console.log('terminal-error-sound is now active!');
 
-	// Test command: run "Terminal Error Sound: Test Sound" from the Command Palette
+	wavPath = path.join(context.extensionPath, 'media', 'faaah.wav');
+
+	// Test command via Command Palette
 	context.subscriptions.push(
 		vscode.commands.registerCommand('terminal-error-sound.testSound', () => {
-			playErrorSound(context);
+			playSound();
 		})
 	);
 
-	// Log when shell integration activates so we know it's working
+	// Log when shell integration activates
 	context.subscriptions.push(
 		vscode.window.onDidChangeTerminalShellIntegration((e) => {
-			console.log(`terminal-error-sound: shell integration active in terminal "${e.terminal.name}"`);
+			console.log(`terminal-error-sound: shell integration active in "${e.terminal.name}"`);
 		})
 	);
 
+	// Play sound on non-zero exit code
 	context.subscriptions.push(
 		vscode.window.onDidEndTerminalShellExecution((event) => {
 			const exitCode = event.exitCode;
 			console.log(`terminal-error-sound: command ended, exitCode=${exitCode}`);
 
 			if (exitCode !== undefined && exitCode !== 0) {
-				playErrorSound(context);
+				playSound();
 			}
 		})
 	);
-}
-
-async function playErrorSound(context: vscode.ExtensionContext) {
-
-	const soundPath = path.join(
-		context.extensionPath,
-		'media',
-		'faaah.wav'
-	);
-
-	console.log(`terminal-error-sound: playing ${soundPath}`);
-
-	try {
-		await soundPlay.play(soundPath);
-	} catch (err) {
-		console.error('terminal-error-sound: failed to play sound –', err);
-	}
-
 }
 
 export function deactivate() {}
